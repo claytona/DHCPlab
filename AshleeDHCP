@@ -1,0 +1,97 @@
+#!/bin/env python
+import struct, json
+
+f = open('ip.pcap','rb')
+hdr = f.read()
+f.close
+
+version = struct.unpack("!B",hdr[0])[0]
+version >>= 4
+print("%x" %version)
+
+IHL = struct.unpack("!B",hdr[0])[0]
+IHL &= 0b00001111
+IHL = (IHL * 32)/8
+print(IHL)
+
+DSCP = struct.unpack("!B",hdr[1])[0]
+DSCP >>= 2
+print("%x" %DSCP)
+
+ECN = struct.unpack("!B",hdr[1])[0]
+ECN &= 0b00000011
+print("%x" %ECN)
+
+TL = struct.unpack("!B",hdr[2])[0]
+TL2 = struct.unpack("!B",hdr[3])[0]
+TL <<= 8
+TL += TL2
+print(TL)
+
+ID = struct.unpack("!B",hdr[4])[0]
+ID2 = struct.unpack("!B",hdr[5])[0]
+ID <<= 8
+ID += ID2
+print(ID)
+
+Rflag = struct.unpack("!B",hdr[6])[0]
+Rflag >>= 7
+print("%x" %Rflag)
+
+DFflag = struct.unpack("!B",hdr[6])[0]
+DFflag >>= 6
+DFflag &= 0b00000001
+print("%x" %DFflag)
+
+MFflag = struct.unpack("!B",hdr[6])[0]
+MFflag >>= 5
+MFflag &= 0b00000001
+print("%x" %MFflag)
+
+Offset = struct.unpack("!B",hdr[6])[0]
+Offset2 = struct.unpack("!B",hdr[7])[0]
+Offset <<= 8
+Offset += Offset2
+Offset &= 0b0000111111111111
+print(Offset)
+
+TTL = struct.unpack("!B",hdr[8])[0]
+print(TTL)
+
+Pro = struct.unpack("!B",hdr[9])[0]
+print(Pro)
+
+Chk = struct.unpack("!B",hdr[10])[0]
+Chk2 = struct.unpack("!B",hdr[11])[0]
+Chk <<= 8
+Chk += Chk2
+print("%x" %Chk)
+
+SRC = struct.unpack("!B",hdr[12])[0]
+SRC2 = struct.unpack("!B",hdr[13])[0]
+SRC3 = struct.unpack("!B",hdr[14])[0]
+SRC4 = struct.unpack("!B",hdr[15])[0]
+SRC = (str(SRC 1) + '.' + str(SRC 2) + '.'+ str(SRC 3) + '.' + str(SRC 4))
+
+DST = struct.unpack("!B",hdr[16])[0]
+DST2 = struct.unpack("!B",hdr[17])[0]
+DST3 = struct.unpack("!B",hdr[18])[0]
+DST4 = struct.unpack("!B",hdr[19])[0]
+DST = (str(DST 1) + '.' + str(DST 2) + '.'+ str(DST 3) + '.' + str(DST 4))
+
+s = {'Version' : version,
+ 'Header Length' : HL,
+ 'Differentiated Services Code Point' : DSCP,
+ 'Explicit Congestion Notification' : ECN,
+ 'Total Length' : TL,
+ 'Identfication' : ID,
+ 'Reserved Flag' : Rflag,
+ 'Dont Fragment Flag' : DFflag,
+ 'More Fragments Flag' : MFflag,
+ 'Fragment Offset' : Offset,
+ 'Time to Live' : TTL,
+ 'Protocol' : Pro,
+ 'Checksum' : Chk,
+ 'Source Address' : SRC,
+ 'Destination Address' : DST}
+print (json.dumps(s, separators=('\n', ' ')))
